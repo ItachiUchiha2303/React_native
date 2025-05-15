@@ -4,35 +4,56 @@ const login = async (reqBody) => {
   const { email, fullname, googleId } = reqBody;
 
   if (!email || !fullname || !googleId) {
-    throw new Error("All fields (email, fullname, googleId) are required.", {
-      cause: { status: 400 },
-    });
+    const error = new Error(
+      "All fields (email, fullname, googleId) are required."
+    );
+    error.statusCode = 400;
+    throw error;
   }
 
-  // Check if the user already exists
   const existingUser = await UserDummy.findOne({ email });
 
   if (existingUser) {
-    throw new Error("User already exists. Please log in instead.", {
-      cause: { status: 409 }, // 409 Conflict
-    });
+    const error = new Error("User already exists. Please log in instead.");
+    error.statusCode = 409;
+    throw error;
   }
 
-  // Create a new user if not exists
   const user = await UserDummy.create({
     username: fullname,
     email,
     googleId,
   });
 
-  // Return the new user data
   return {
     _id: user._id,
     username: user.username,
     email: user.email,
+    role: user.role,
+  };
+};
+
+const updateUserData = async (userId, updateData) => {
+  const updatedUser = await UserDummy.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedUser) {
+    const error = new Error("User not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return {
+    _id: updatedUser._id,
+    username: updatedUser.username,
+    role: updatedUser.role,
+    email: updatedUser.email,
   };
 };
 
 module.exports = {
   login,
+  updateUserData,
 };

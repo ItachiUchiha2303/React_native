@@ -17,7 +17,7 @@ app.use(express.json());
 app.use("/v1", router);
 
 // Default route
-app.use("/test", (req, res) => {
+app.use("/", (req, res) => {
   res.send("API is Working");
 });
 
