@@ -11,15 +11,28 @@ const login = async (reqBody) => {
     throw error;
   }
 
-  const existingUser = await UserDummy.findOne({ email });
+  // ✅ Check if the user already exists by Google ID or Email
+  let user = await UserDummy.findOne({ email });
 
-  if (existingUser) {
-    const error = new Error("User already exists. Please log in instead.");
-    error.statusCode = 409;
-    throw error;
+  if (user) {
+    // ✅ If user exists, verify the googleId matches
+    if (user.googleId !== googleId) {
+      const error = new Error("Google account mismatch.");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    // ✅ Return existing user for login
+    return {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
   }
 
-  const user = await UserDummy.create({
+  // ✅ If user does not exist, create one
+  user = await UserDummy.create({
     username: fullname,
     email,
     googleId,
