@@ -26,8 +26,8 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "",
     },
-    googleId: { type: String , unique:true},
-    facebookId: { type: String, unique:true},
+    googleId: { type: String, unique: true },
+    facebookId: { type: String, unique: true },
     email: { type: String, required: true, unique: true },
     address: { type: String, default: "" },
     profile: {
@@ -39,4 +39,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+const UserDummy = mongoose.model("UserDummy", userSchema);
+
+module.exports = UserDummy;

@@ -1,27 +1,36 @@
-const User = require("../model/User.model");
+const UserDummy = require("../model/user_dummy.model");
 
-const login = async (req) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) {
-    //   return res.status(401).json({ message: "Invalid email or password" });
-    throw new Error("Invalid Email", { cause: { status: 401 } });
-  }
-  const isMatch = await bcrypt.compare(password, user.password);
-  console.log(isMatch, "dfghjk");
-  if (!isMatch) {
-    throw new Error("Invalid Password", { cause: { status: 401 } });
+const login = async (reqBody) => {
+  const { email, fullname, googleId } = reqBody;
+
+  if (!email || !fullname || !googleId) {
+    throw new Error("All fields (email, fullname, googleId) are required.", {
+      cause: { status: 400 },
+    });
   }
 
-  //   const userData = generateToken(user);
-  //   const userData = user;
-  // res.status(200).json({
-  //   _id: user.id,
-  //   name: user.name,
-  //   email: user.email,
-  //   token: generateToken(user.id),
-  // });
-  return isMatch ? user : "invalid password";
+  // Check if the user already exists
+  const existingUser = await UserDummy.findOne({ email });
+
+  if (existingUser) {
+    throw new Error("User already exists. Please log in instead.", {
+      cause: { status: 409 }, // 409 Conflict
+    });
+  }
+
+  // Create a new user if not exists
+  const user = await UserDummy.create({
+    username: fullname,
+    email,
+    googleId,
+  });
+
+  // Return the new user data
+  return {
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+  };
 };
 
 module.exports = {
