@@ -11,7 +11,8 @@ connect();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // for JSON
+app.use(express.urlencoded({ extended: true })); // for form-urlencoded
 
 // Routes
 app.use("/v1", router);

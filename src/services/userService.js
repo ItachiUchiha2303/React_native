@@ -66,7 +66,23 @@ const updateUserData = async (userId, updateData) => {
   };
 };
 
+const updateProfile = async (userId, updateData) => {
+  const updatedUser = await UserDummy.findByIdAndUpdate(userId, updateData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedUser) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return updatedUser;
+};
+
 module.exports = {
   login,
   updateUserData,
+  updateProfile,
 };

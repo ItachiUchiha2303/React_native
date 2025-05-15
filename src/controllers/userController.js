@@ -31,9 +31,32 @@ const updateUserData = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user || req.params.id;
+
+    const updateData = req.body;
+
+    // If file is uploaded, add the Cloudinary image URL
+    if (req.file && req.file.path) {
+      updateData.profile = req.file.path; // Cloudinary URL
+    }
+
+    const updatedUser = await userService.updateProfile(userId, updateData);
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    catchAsync(error, res);
+  }
+};
+
 module.exports = {
   userLogin,
   updateUserData,
+  updateProfile,
 };
 
 // const { login } = require("../services/user.service");
